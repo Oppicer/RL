@@ -1,0 +1,11 @@
+model: "Qwen/Qwen1.5-1.8B"
+dataset: "dataset/sample.tok"
+
+# LoRA hyper-parameters
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+
+# Training
+batch_size: 2
+epochs: 1

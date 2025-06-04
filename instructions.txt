@@ -21,13 +21,13 @@ pip install "unsloth[flash-attn]" transformers accelerate bitsandbytes peft \
 
 ## 2. Prepare the Dataset
 
-The repository provides a script that downloads a small sample of The Stack dataset and tokenizes it.
+The repository provides a script that downloads a small sample of The Stack dataset and tokenizes it. If the dataset is gated, run `huggingface-cli login` to authenticate with the Hugging Face Hub first.
 
 ```bash
 bash data/build_dataset.sh
 ```
 
-The processed data will be stored in the `dataset/` directory.
+The processed data will be stored in the `dataset/` directory (about 20 MB). You can override this location by setting the `DATASET_DIR` environment variable before running the script.
 
 ## 3. Download Base Model Weights (4-bit)
 

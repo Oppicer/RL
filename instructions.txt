@@ -49,6 +49,8 @@ python pipelines/train_full.py --config configs/rtx3070.yaml
 
 Training outputs are saved under `outputs/`.
 
+The chosen seed and config are logged to `outputs/run.log`.
+
 Use `--seed` to fix the random seed for reproducible runs (default is `42`):
 
 ```bash

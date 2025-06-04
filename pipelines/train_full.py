@@ -8,6 +8,7 @@ from pathlib import Path
 import random
 import torch
 import numpy as np
+import yaml
 from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
@@ -31,17 +32,15 @@ def set_seed(seed: int):
 
 def log_run(cfg, seed: int):
     """Log configuration and seed to outputs directory."""
-    import yaml
     out_dir = Path("outputs")
     out_dir.mkdir(exist_ok=True)
     log_file = out_dir / "run.log"
-    with open(log_file, "w") as f:
-        yaml.dump(cfg, f)
-        f.write(f"\nseed: {seed}\n")
+    with open(log_file, "a") as f:
+        yaml.safe_dump(cfg, f)
+        f.write(f"seed: {seed}\n")
 
 
 def load_config(path):
-    import yaml
     with open(path) as f:
         return yaml.safe_load(f)
 

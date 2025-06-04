@@ -14,6 +14,11 @@ from peft import LoraConfig, get_peft_model
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, required=True)
+    parser.add_argument(
+        "--no_dgm",
+        action="store_true",
+        help="Skip the lightweight DGM loop after Alpha-Evolve",
+    )
     return parser.parse_args()
 
 
@@ -61,6 +66,10 @@ def main():
 
     # Placeholder for GRM-lite and Alpha-Evolve steps
     print("[INFO] GRM-lite and Alpha-Evolve steps would run here.")
+
+    if not args.no_dgm:
+        from dgm.loop import run as dgm_run
+        dgm_run()
 
 if __name__ == "__main__":
     main()

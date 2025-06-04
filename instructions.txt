@@ -1,0 +1,68 @@
+# Getting Started with the RTX 3070 Code-Creation Agent
+
+This guide helps you set up and run the training pipeline on a single RTX 3070 with 8 GB of VRAM. No prior experience is required.
+
+## 1. Install Python and Create the Environment
+
+1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) if you do not already have it.
+2. Open a terminal and create a new environment:
+
+```bash
+conda create -n q3070 python=3.10 -y
+conda activate q3070
+```
+
+3. Install the required libraries:
+
+```bash
+pip install "unsloth[flash-attn]" transformers accelerate bitsandbytes peft \
+            datasets tiktoken wandb triton==2.1.0 ray==2.11.0 vllm==0.4.0
+```
+
+## 2. Prepare the Dataset
+
+The repository provides a script that downloads a small sample of The Stack dataset and tokenizes it.
+
+```bash
+bash data/build_dataset.sh
+```
+
+The processed data will be stored in the `dataset/` directory.
+
+## 3. Download Base Model Weights (4-bit)
+
+Use the helper script to download the base model in 4-bit form:
+
+```bash
+python scripts/pull_4bit.py
+```
+
+This creates the `models/4bit/` directory with the model and tokenizer.
+
+## 4. Run the Training Pipeline
+
+Launch the simplified training pipeline, which performs supervised fine-tuning and shows where later stages would go:
+
+```bash
+python pipelines/train_full.py --config configs/rtx3070.yaml
+```
+
+Training outputs are saved under `outputs/`.
+
+## 5. Launch the Gradio Interface
+
+After training, you can test the model with the Gradio web UI:
+
+```bash
+python gui/gradio_app.py
+```
+
+A local web server will open in your browser where you can submit prompts.
+
+## Troubleshooting
+
+- **Out of Memory (OOM)**: reduce the `batch_size` or sequence length in `configs/rtx3070.yaml`.
+- **Slow training**: remove `gradient_checkpointing` or lower LoRA ranks.
+- **Dataset script fails**: ensure you have an internet connection when downloading datasets.
+
+For additional details, see `README.md`.

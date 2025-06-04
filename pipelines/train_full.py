@@ -35,9 +35,10 @@ def log_run(cfg, seed: int):
     out_dir = Path("outputs")
     out_dir.mkdir(exist_ok=True)
     log_file = out_dir / "run.log"
+    # Append run information as a single YAML document
+    log_data = {"config": cfg, "seed": seed}
     with open(log_file, "a") as f:
-        yaml.safe_dump(cfg, f)
-        f.write(f"seed: {seed}\n")
+        yaml.safe_dump(log_data, f, explicit_start=True)
 
 
 def load_config(path):

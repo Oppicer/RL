@@ -59,6 +59,18 @@ python gui/gradio_app.py
 
 A local web server will open in your browser where you can submit prompts.
 
+## 6. Run Benchmark Evaluations
+
+Use the helper script in `eval/` to evaluate a checkpoint on HumanEval and a
+small APPS subset. Provide the path to your model and choose the benchmark
+subset:
+
+```bash
+python eval/run_all.py --ckpt <path-to-checkpoint> --subset humaneval,apps_dev_med
+```
+
+Results are written under the `eval_results/` directory by default.
+
 ## Troubleshooting
 
 - **Out of Memory (OOM)**: reduce the `batch_size` or sequence length in `configs/rtx3070.yaml`.

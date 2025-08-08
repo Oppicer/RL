@@ -108,6 +108,8 @@ After training completes, the user will want to use the fine-tuned model elsewhe
 
 We ensure the user can choose either or both export formats. The UI might have an “Export Model” dialog with checkboxes for “FP16” and “AWQ 4-bit”. Upon export, the app merges weights as needed and then either directly saves FP16, or calls the AWQ conversion pipeline. We cite that AWQ was an MLSys 2024-winning approach for accurate 4-bit quantization, underscoring that this isn’t a naive quantization but a proven method. For the user, the exported int4 model allows them to run the model in lightweight environments (even possibly on the CPU or smaller GPU, since 0.6B at 4-bit will be very small). The FP16 model is there for compatibility or if they wish to fine-tune further elsewhere.
 
+Developers using the command-line training script can invoke these exports directly. Running `python pipelines/train_full.py --config <cfg> --export_fp16` merges LoRA weights into an FP16 model, while adding `--export_awq` performs an additional AWQ int4 quantization step.
+
 All exported models, logs, and any other artifacts can be bundled if the user wants to share their trained model. The app could even integrate a direct uploader to Hugging Face Hub (using their API) to make sharing easy, though that’s an optional feature.
 
 ## Packaging and Distribution

@@ -42,10 +42,58 @@ def import_with_stubs(monkeypatch):
 def test_argument_parsing(monkeypatch):
     mod = import_with_stubs(monkeypatch)
 
-    with mock.patch.object(sys, 'argv', ['prog', '--config', 'cfg.yaml']):
+    with mock.patch.object(sys, 'argv', ['prog', '--config', 'cfg.yaml', '--export_fp16', '--export_awq', '--no_dgm']):
         args = mod.parse_args()
     assert args.config == 'cfg.yaml'
+    assert args.export_fp16 is True
+    assert args.export_awq is True
+    assert args.no_dgm is True
 
     with mock.patch.object(sys, 'argv', ['prog']):
         with pytest.raises(SystemExit):
             mod.parse_args()
+
+
+def test_export_helpers(monkeypatch, tmp_path):
+    mod = import_with_stubs(monkeypatch)
+
+    class DummyModel:
+        def merge_and_unload(self):
+            return self
+
+        def save_pretrained(self, path):
+            (Path(path) / 'model.bin').write_text('x')
+
+    class DummyTokenizer:
+        def save_pretrained(self, path):
+            (Path(path) / 'tokenizer.json').write_text('x')
+
+    # Test export_fp16
+    out = mod.export_fp16(DummyModel(), DummyTokenizer(), out_dir=tmp_path / 'fp16')
+    assert (Path(out) / 'model.bin').exists()
+    assert (Path(out) / 'tokenizer.json').exists()
+
+    # Stub AWQ package
+    quantized = {}
+
+    class AWQModel:
+        @classmethod
+        def from_pretrained(cls, src):
+            quantized['src'] = src
+            return cls()
+
+        def quantize(self, tokenizer, out_dir):
+            quantized['out'] = out_dir
+
+    class AWQTokenizer:
+        @classmethod
+        def from_pretrained(cls, src):
+            return cls()
+
+    awq_mod = types.SimpleNamespace(AutoAWQForCausalLM=AWQModel)
+    monkeypatch.setitem(sys.modules, 'awq', awq_mod)
+    monkeypatch.setattr(mod, 'AutoTokenizer', AWQTokenizer)
+
+    awq_dir = mod.export_awq(tmp_path / 'fp16', out_dir=tmp_path / 'awq')
+    assert quantized['out'] == tmp_path / 'awq'
+    assert awq_dir == tmp_path / 'awq'

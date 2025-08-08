@@ -42,9 +42,12 @@ def import_with_stubs(monkeypatch):
 def test_argument_parsing(monkeypatch):
     mod = import_with_stubs(monkeypatch)
 
-    with mock.patch.object(sys, 'argv', ['prog', '--config', 'cfg.yaml']):
+    with mock.patch.object(sys, 'argv', ['prog', '--config', 'cfg.yaml', '--export_fp16', '--export_awq', '--no_dgm']):
         args = mod.parse_args()
     assert args.config == 'cfg.yaml'
+    assert args.export_fp16 is True
+    assert args.export_awq is True
+    assert args.no_dgm is True
 
     with mock.patch.object(sys, 'argv', ['prog']):
         with pytest.raises(SystemExit):
